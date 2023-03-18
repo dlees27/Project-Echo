@@ -10,11 +10,57 @@ function initialiseHMI(hmiState) {
     console.log(`initialising`);
   
     createBasemap(hmiState);
+
+    addDummyMarkers(hmiState);
   
     //simulateData(hmiState);
 }
 
-function createBasemap(appState) {
+function addDummyMarkers(hmiState){
+    //***Add some sample markers (WIP)***
+    var markers = [];
+
+    for(var i=0; i< 10; i++) {
+      // Compute a random icon and lon/lat position.
+      var lon = hmiState.originLon + (Math.random() * 0.1);
+      var lat = hmiState.originLat + (Math.random() * 0.1);
+      
+      // Add the marker into the array
+      var mark= new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.fromLonLat([lon,lat])),
+        name: "marker" + i
+      });
+      var icon = new ol.style.Style({
+          image: new ol.style.Icon({
+            src: "location-pointer.png",//static/style/icons/" + markups[i%3],
+            anchor: [0.5, 1],
+            scale: 0.1
+          })
+      })
+      mark.setStyle(icon);
+      markers.push(mark);
+    }
+
+    console.log('markers: ', markers)
+
+    var markerSource = new ol.source.Vector();
+
+    markerSource.addFeatures(markers);
+
+    var markerLayer = new ol.layer.Vector({
+      source: new ol.source.Vector({
+        features: markers
+      })
+    });
+
+    markerLayer.setZIndex(100);
+    
+    hmiState.basemap.addLayer(markerLayer);
+
+    console.log('marker Layer: ', markerLayer);
+}
+
+function createBasemap(hmiState) {
   
     // Microphone layer
     var micSource = new ol.source.Vector();
@@ -58,45 +104,6 @@ function createBasemap(appState) {
         zoom: hmiState.defaultZoom,
       }),
     });
-
-    //***Add some sample markers (WIP)***
-    
-    var markers = [];
-
-    for(var i=0; i< 10; i++) {
-      // Compute a random icon and lon/lat position.
-      var lon = hmiState.originLat //+ Math.random();
-      var lat = hmiState.originLon //+ Math.random();
-      
-      // Add the marker into the array
-      var mark= new ol.Feature({
-        geometry: new ol.geom.Point(
-          ol.proj.fromLonLat([lon, lat], "EPSG:900913")
-        ),
-      });
-      var icon = new ol.style.Style({
-          image: new ol.style.Icon({
-            src: "/static/style/icons/"+ markups[i % 3]}),
-          imgSize: 20,
-      })
-      mark.setStyle(icon);
-      markers.push(mark);
-    }
-
-    console.log('markers: ', markers)
-
-    var markerSource = new ol.source.Vector();
-
-    markerSource.addFeatures(markers);
-
-    var markerLayer = new ol.layer.Vector({
-        name: 'markerLayer',
-        source: markerSource,
-    });
-    
-    basemap.addLayer(markerLayer);
-
-    console.log('marker Layer: ', markerLayer);
     
     hmiState.basemap = basemap;
 
