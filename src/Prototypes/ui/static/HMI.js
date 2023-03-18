@@ -53,41 +53,7 @@ function createBasemap(appState) {
       }),
     });
   
-  
-    // Not used but leaving here for example
-    //
-    //   let select = new ol.interaction.Select({
-    //     condition: ol.events.condition.pointerMove,
-    //   });
-    //   select.on("select", (evt) => {
-    //     console.log(evt);
-    //   });
-    //   map.addInteraction(select);
-  
-    appState.basemap = basemap;
-  
-    //appState.heartbeatStyle = getEventStyles(appState, 'heartbeat');
-    //appState.pulseStyle = getEventStyles(appState, 'drtpulse');
-
-  
-    /*appState.outlineStyle = new ol.style.Style({
-      visible: false,
-      lineCap: 'round',
-      stroke: new ol.style.Stroke({
-        color: [0, 0, 0],
-        width: appState.participantOutlineScale,
-      }),
-    });
-  
-    appState.participantOutlineMarkerStyle = new ol.style.Style({
-      image: new ol.style.Circle({
-        radius: 10,
-        stroke: new ol.style.Stroke({
-          color: [0, 0, 0],
-          width: 3,
-        }),
-      }),
-    });*/
+    hmiState.basemap = basemap;
   
     return basemap;
 }
