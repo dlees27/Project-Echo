@@ -1,5 +1,11 @@
 'use strict';
 
+var markups = [
+  "elephant.svg",
+  "monkey.svg",
+  "tiger.svg"
+]
+
 function initialiseHMI(hmiState) {
     console.log(`initialising`);
   
@@ -52,8 +58,48 @@ function createBasemap(appState) {
         zoom: hmiState.defaultZoom,
       }),
     });
-  
+
+    //***Add some sample markers (WIP)***
+    
+    var markers = [];
+
+    for(var i=0; i< 10; i++) {
+      // Compute a random icon and lon/lat position.
+      var icon = Math.floor(Math.random() * markups.length);
+      var lon = Math.random() * 360 - 180;
+      var lat = Math.random() * 170 - 85;
+      
+
+      // Add the marker into the array
+      var mark= new ol.Feature({
+        geometry: new ol.geom.Point(
+          ol.proj.fromLonLat([lon, lat], "EPSG:900913")
+        ),
+      });
+      var icon = new ol.style.Style({
+          image: new ol.style.Icon({
+            src: "/static/style/icons/"+ markups[icon]}),
+          imgSize: 20,
+
+      })
+      mark.setStyle(icon);
+      markers.push(mark);
+    }
+
+    console.log('markers: ', markers)
+
+    var markerSource = new ol.source.Vector({
+  		features: [markers],
+    });
+    var markerLayer = new ol.layer.Vector({
+  		source: markerSource,
+	  });
+    map.addLayer(markerLayer);
+
+    console.log('marker Layer: ', markerLayer);
+    
     hmiState.basemap = basemap;
+
   
     return basemap;
 }
