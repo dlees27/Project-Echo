@@ -65,11 +65,9 @@ function createBasemap(appState) {
 
     for(var i=0; i< 10; i++) {
       // Compute a random icon and lon/lat position.
-      var icon = Math.floor(Math.random() * markups.length);
-      var lon = Math.random() * 360 - 180;
-      var lat = Math.random() * 170 - 85;
+      var lon = hmiState.originLat //+ Math.random();
+      var lat = hmiState.originLon //+ Math.random();
       
-
       // Add the marker into the array
       var mark= new ol.Feature({
         geometry: new ol.geom.Point(
@@ -78,9 +76,8 @@ function createBasemap(appState) {
       });
       var icon = new ol.style.Style({
           image: new ol.style.Icon({
-            src: "/static/style/icons/"+ markups[icon]}),
+            src: "/static/style/icons/"+ markups[i % 3]}),
           imgSize: 20,
-
       })
       mark.setStyle(icon);
       markers.push(mark);
@@ -88,19 +85,21 @@ function createBasemap(appState) {
 
     console.log('markers: ', markers)
 
-    var markerSource = new ol.source.Vector({
-  		features: [markers],
-    });
+    var markerSource = new ol.source.Vector();
+
+    markerSource.addFeatures(markers);
+
     var markerLayer = new ol.layer.Vector({
-  		source: markerSource,
-	  });
-    map.addLayer(markerLayer);
+        name: 'markerLayer',
+        source: markerSource,
+    });
+    
+    basemap.addLayer(markerLayer);
 
     console.log('marker Layer: ', markerLayer);
     
     hmiState.basemap = basemap;
 
-  
     return basemap;
 }
  
