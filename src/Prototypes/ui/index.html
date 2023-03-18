@@ -1,34 +1,67 @@
-<!DOCTYPE html>
-<!-- Minosha Gamage -->
 <html>
- <head>
- <title>Echo HMI</title>
- <script type="text/javascript" src="src/audio.js"></script>
- </head>
- <body>
- <h1>Audio Data</h1>
- <p>Audio signals may be characterized by parameters such as their bandwidth, nominal level, power level in decibels (dB), and voltage level.</p>
- <p id="currentRecord">Audio list is empty</p>
- <form> 
-	Audio ID:<br/>
-	<input type="text" id="AudioID"/> <br/>
-	Species:<br/>
-	<input type="text" id="Species"/> <br/>
-	Recording:<br/>
-	<input type="text" id="Recording"/> <br/>
-	Timestamp:<br/>
-	<input type="text" id="Timestamp"/> <br/>
-	Latitude:<br/>
-	<input type="text" id="Latitude"/> <br/>
-	Longitude:<br/>
-	<input type="text" id="Longitude"/> <br/>
-	<p> </p>
-	<button type="button" onclick="doNext()">Next</button>
-	<button type="button" onclick="doPrev()">Prev</button>
-	<button type="button" onclick="doAdd()">Add</button>
-	<button type="button" onclick="doDelete()">Delete</button>
- </form>
- <p id="message"></p>
+    <head>
+		<!-- Imports -->
+        <meta charset="UTF-8">
+		<!-- Open Layers -->
+		<link rel="stylesheet" type="text/css" href="static/node_modules/ol/ol.css">
+        <script type="text/javascript" src="static/third_party/ol_v6.5.0-dist/ol.js"></script>
 
- </body>
+		<!-- HMI -->
+		<link rel="stylesheet" href="static/style/HMI_style.css" type="text/css">
+		<script type="text/javascript" src="static/audio.js"></script>
+		<script type="text/javascript" src='static/HMI.js'></script>
+
+        <!-- End Imports -->
+
+        <title>Echo HMI</title>
+    </head>
+    <body>
+		<div id="content">
+            <div id="leftPane">
+				<!-- Minosha Gamage -->
+                <h1>Audio Data</h1>
+                <p>Audio signals may be characterized by parameters such as their bandwidth, nominal level, power level in decibels (dB), and voltage level.</p>
+                <p id="currentRecord">Audio list is empty</p>
+                <form> 
+	                Audio ID:<br/>
+	                <input type="text" id="AudioID"/> <br/>
+	                Species:<br/>
+	                <input type="text" id="Species"/> <br/>
+	                Recording:<br/>
+	                <input type="text" id="Recording"/> <br/>
+	                Timestamp:<br/>
+	                <input type="text" id="Timestamp"/> <br/>
+	                Latitude:<br/>
+	                <input type="text" id="Latitude"/> <br/>
+	                Longitude:<br/>
+	                <input type="text" id="Longitude"/> <br/>
+	                <p> </p>
+	                <button type="button" onclick="doNext()">Next</button>
+	                <button type="button" onclick="doPrev()">Prev</button>
+	                <button type="button" onclick="doAdd()">Add</button>
+	                <button type="button" onclick="doDelete()">Delete</button>
+                </form>
+                <p id="message"></p>
+			</div>
+			<div id="rightPane">
+				<div id="basemap"></div>
+			</div>
+        </div>
+		<script type="text/javascript">
+
+			//All global state based info is stored in the hmiState
+			let hmiState = {};
+			window.hmiState = hmiState;
+
+			//Basemap config
+			hmiState.originLat = -38.80780;
+			hmiState.originLon = 143.54741;
+			hmiState.defaultZoom = 18;
+
+
+			hmiState.requestInterval = 1000;
+
+			initialiseHMI(hmiState);
+		</script>
+    </body>
 </html>

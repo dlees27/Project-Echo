@@ -8,6 +8,13 @@ Install Visual Studio Code [https://code.visualstudio.com/]
 
 Install Miniconda [https://docs.conda.io/en/latest/miniconda.html]
 
+Install pip
+```
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+
+python get-pip.py
+```
+
 In c:\ProgramData\pip\pip.ini add these lines:
 
 ```
