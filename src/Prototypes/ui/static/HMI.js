@@ -1,9 +1,9 @@
 'use strict';
 
 var markups = [
-  "elephant.svg",
-  "monkey.svg",
-  "tiger.svg"
+  "elephant.png",
+  "monkey.png",
+  "tiger.png"
 ]
 
 function initialiseHMI(hmiState) {
@@ -32,9 +32,9 @@ function addDummyMarkers(hmiState){
       });
       var icon = new ol.style.Style({
           image: new ol.style.Icon({
-            src: "location-pointer.png",//static/style/icons/" + markups[i%3],
+            src: "" + markups[i%3],
             anchor: [0.5, 1],
-            scale: 0.1
+            scale: 0.05
           })
       })
       mark.setStyle(icon);
@@ -104,6 +104,50 @@ function createBasemap(hmiState) {
         zoom: hmiState.defaultZoom,
       }),
     });
+    
+    var markers = [];
+
+    for(var i=0; i< 10; i++) {
+      // Compute a random icon and lon/lat position.
+      var lon = hmiState.originLat //+ Math.random();
+      var lat = hmiState.originLon //+ Math.random();
+      
+      // Add the marker into the array
+      var mark= new ol.Feature({
+        geometry: new ol.geom.Point(
+          ol.proj.fromLonLat([lon, lat], "EPSG:900913")
+        ),
+      });
+      var img = new Image(10,10)
+      img.src = "./static/style/icons/"+ markups[i % 3]
+      var icon = new ol.style.Style({
+          image: new ol.style.Icon({
+            anchor: [lon, lat],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'pixels',
+            opacity: 0.75,
+            image: img,
+            src: "./static/style/icons/"+ markups[i % 3]}),
+            size: 10,
+      })
+      mark.setStyle(icon);
+      markers.push(mark);
+    }
+
+    console.log('markers: ', markers)
+
+    var markerSource = new ol.source.Vector();
+
+    markerSource.addFeatures(markers);
+
+    var markerLayer = new ol.layer.Vector({
+        name: 'markerLayer',
+        source: markerSource,
+    });
+    
+    basemap.addLayer(markerLayer);
+
+    console.log('marker Layer: ', markerLayer);
     
     hmiState.basemap = basemap;
 
