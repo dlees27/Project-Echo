@@ -1,0 +1,23 @@
+[{
+    "timestamp": "2023-03-22T13:45:00.000Z",
+    "sensorId": 2,
+    "species": "Sus Scrofa",
+    "microphoneLLA":[-33.1101,150.0567, 23],
+    "animalEstLLA": [-33.1532,150.0207, 23],
+    "animalTrueLLA": [-33.1545,150.0209, 23],
+    "animalLLAUncertainty": 10,
+    "audio clip": "some audio_base64 data",
+    "confidence": 99.4
+},
+{
+    "timestamp": "2023-03-22T13:55:00.000Z",
+    "sensorId": 2,
+    "species": "Cervus Unicolour",
+    "microphoneLLA":[-33.1101,150.0567, 23],
+    "animalEstLLA": [-33.1543,150.2007, 23],
+    "animalTrueLLA": [-33.1555,150.2009, 23],
+    "animalLLAUncertainty": 10,
+    "audio clip": "some audio_base64 data",
+    "confidence": 99.5
+}
+]
