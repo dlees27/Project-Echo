@@ -539,7 +539,7 @@ i {
   background-color: #e48595;
   transform: translateY(-10px);
 }
-/*
+
 #app {
   display: none;
   margin-top: 100px;
@@ -556,7 +556,7 @@ i {
   color: #e48595;
   padding: 20px;
   overflow-y: scroll;
-}*/
+}
 
 /* Width and height of the scrollbar */
 ::-webkit-scrollbar {
