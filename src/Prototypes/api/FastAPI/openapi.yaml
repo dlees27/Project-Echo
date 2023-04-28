@@ -1,0 +1,126 @@
+components:
+  schemas:
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
+      type: object
+    ValidationError:
+      properties:
+        loc:
+          items:
+            type: string
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+      type: object
+info:
+  title: FastAPI
+  version: 0.1.0
+openapi: 3.0.2
+paths:
+  /audio:
+    get:
+      operationId: show_audio_audio_get
+      parameters:
+      - in: query
+        name: id
+        required: true
+        schema:
+          title: Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: returns audio given ID
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Show Audio
+  /events_time:
+    get:
+      operationId: show_event_from_time_events_time_get
+      parameters:
+      - in: query
+        name: start
+        required: true
+        schema:
+          title: Start
+          type: string
+      - in: query
+        name: end
+        required: true
+        schema:
+          title: End
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Get detection events within certain duration
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Show Event From Time
+  /microphones:
+    get:
+      operationId: list_microphones_microphones_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: returns location of all microphones
+      summary: List Microphones
+  /movement_time:
+    get:
+      operationId: show_event_from_time_movement_time_get
+      parameters:
+      - in: query
+        name: start
+        required: true
+        schema:
+          title: Start
+          type: string
+      - in: query
+        name: end
+        required: true
+        schema:
+          title: End
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Get true animal movement data within certain duration
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Show Event From Time

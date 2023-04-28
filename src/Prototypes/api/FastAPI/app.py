@@ -8,7 +8,10 @@ from typing import Optional, List
 import datetime
 import serializers
 import models
+import functools
 import pymongo
+import yaml
+import io
 import dotenv
 
 app = FastAPI()
@@ -21,6 +24,13 @@ connection_string=f"mongodb+srv://{id}:{password}@cluster0.gu2idc8.mongodb.net/t
 client = pymongo.MongoClient(connection_string)
 db = client.mydatabase
 
+@app.get('/openapi.yaml', include_in_schema=False)
+@functools.lru_cache()
+def read_openapi_yaml() -> Response:
+    openapi_json= app.openapi()
+    yaml_s = io.StringIO()
+    yaml.dump(openapi_json, yaml_s)
+    return Response(yaml_s.getvalue(), media_type='text/yaml')
 
 @app.get("/events_time", response_description="Get detection events within certain duration")
 def show_event_from_time(start: str, end: str):
