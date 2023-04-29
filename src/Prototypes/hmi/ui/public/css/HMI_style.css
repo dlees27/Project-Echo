@@ -60,6 +60,21 @@ h2 {
   position: fixed; 
 }
 
+@media (min-width: 768px) {
+  #menu {
+    max-width: 500px;
+  }
+  #filter-menu{
+    max-width: 500px;
+  }
+  #animal-popup{
+    max-width: 500px;
+  }
+  #FAQ{
+    max-width: 500px;
+  }
+}
+
 .navbar {
   margin-top: 50px;
   display: flex;
@@ -85,6 +100,7 @@ h2 {
 }
 
 #FAQ-contents{
+  padding-top: 20px;
   margin-left: 30px;
 }
 
@@ -106,6 +122,7 @@ h2 {
 }
 
 #filter-menu-contents{
+  padding-top: 20px;
   margin-left: 30px;
 }
 
@@ -304,7 +321,7 @@ input[type="checkbox"]{
     background-color: none;
     color: white;
     overflow-x: hidden;
-    padding-top: 60px;
+    padding-top: 90px;
     margin-top: 30px;
 }
 
@@ -479,14 +496,14 @@ i {
     margin-top: 20px;
   }
   .toggle-label{
-    color:#666;
+    color: white;
     font-family: var(--bs-btn-font-family);
     font-size: var(--bs-btn-font-size);
     font-weight: var(--bs-btn-font-weight);
     line-height: var(--bs-btn-line-height);
   }
   .past-data-header{
-    color:#666;
+    color: white;
     font-family: var(--bs-btn-font-family);
     font-size: var(--bs-btn-font-size);
     font-weight: var(--bs-btn-font-weight);
@@ -526,18 +543,20 @@ i {
   background-color: rgba(128, 128, 128, 0.699);
   border: none;
   color: #cccccc;
-  font-size: larger;
+  font-size: 30px;
+  font-style: italic;
   font-weight: bold;
   cursor: pointer;
   outline: none;
-  width: 30px;
-  height: 30px;
+  width: 50px;
+  height: 50px;
   text-align: center;
+  transform: translateY(-10px);
 }
 
 .tabs-button.active {
   background-color: #e48595;
-  transform: translateY(-10px);
+  /*transform: translateY(-10px);*/
 }
 
 #app {

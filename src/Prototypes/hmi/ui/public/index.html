@@ -115,9 +115,9 @@
       
       <div class="row main bg-black" style="padding: 0px !important;">
         <div class="col-md-12 col-main" style="padding: 0px !important;"> 
-          <div id="basemap" onclick="openNav()"></div>
+          <div id="basemap"></div>
 
-          <div id="menu">
+          <div id="menu" class="menu">
             <div class="navbar">
               <a id="filter-menu-btn" class="tabs-button active" onclick="openTab('filter-menu')">f</a>
               <a id="popup-menu-btn" class="tabs-button" onclick="openTab('animal-popup')">l</a>
@@ -363,18 +363,18 @@
     }
   }
 
+  function closeMenu() {
+    document.getElementById("menu").style.width = "0%";
+    document.getElementById("menu").style.height = "0%";
+    hamburgerStatus = false;
+    closeTab();
+  }
+
   function openMenu() {
     document.getElementById("menu").style.width = "30%";
     document.getElementById("menu").style.height = "100%";
     hamburgerStatus = true;
     openTab(null)
-  }
-
-  function closeMenu() {
-    document.getElementById("menu").style.width = "0%";
-    document.getElementById("menu").style.height = "0%";
-    hamburgerStatus = false;
-    closeTab()
   }
 
   function openTab(tab) {
@@ -425,7 +425,6 @@
 
   function closeTab() {
     console.log("Closing Current Tab")
-    
     currentTab.style.width = "0%"
     currentTab.style.height = "0%"
   }
@@ -438,16 +437,6 @@
     }
     //console.log("Opening Simulator...")
 
-  }
-
-  function openNav() {
-    var hamburger = document.querySelector('.hamburger-icon');
-    
-    if(!hamburger.classList.contains('active')){
-      toggleNav();
-    }
-
-    openTab('animal-popup')
   }
 
   /*function closeNav() {
@@ -585,12 +574,28 @@
 
 <script type="module">
   import { updateLayers, initialiseHMI, showMics, hideMics, updateAnimalMovementLayerFromPastData,
-  resetWildlifeLayers, MapOpenNav, MapCloseNav } from "./js/HMI.js";
+  resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled } from "./js/HMI.js";
   import {retrieveTruthEventsInTimeRange} from "./js/routes.js";
   window.updateMics = updateMics;
   window.updateLayers = updateLayers;
-  //window.openNav = MapOpenNav;
-  window.closeNav = MapCloseNav;
+  //window.openNav = openNav;
+  //window.closeNav = MapCloseNav;
+
+  export function openNav() {
+
+      var hamburger = document.querySelector('.hamburger-icon');
+    
+      if(!hamburger.classList.contains('active')){
+        toggleNav();
+      }
+
+      openTab('animal-popup')
+  }
+
+  document.addEventListener('animalToggled', function(event) {
+    openNav()
+  });
+
 
 
   //All global state based info is stored in the hmiState
