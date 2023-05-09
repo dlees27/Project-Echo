@@ -30,12 +30,17 @@ var transporter = nodemailer.createTransport({
 
 app.post("/send_email", (req,res) => {
   const {email, query} = req.body;
-
+  let html_text = '<div>';
+  html_text += '<h2>A new query has been received!</h2>'
+  html_text += '<p>Sender: \t ' + email + '</p>';
+  html_text += '<p>Query: \t ' + query + '</p>';
+  html_text += '</div>';
   let mailOptions = {
     from: email,
     to: 'echodatabytes@gmail.com',
     subject: 'Query from ' + email,
-    text: query
+    text: query,
+    html: html_text,
   };
   transporter.sendMail(mailOptions, function(error, info){
     if (error) {

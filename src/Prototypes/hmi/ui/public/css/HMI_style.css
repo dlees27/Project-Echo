@@ -21,6 +21,10 @@ h3 {
   color: #e48595 !important;
 }
 
+::-webkit-scrollbar-thumb {
+  height: 20px !important;
+}
+
 h2 {
   color: #e48595 !important;
   font-weight: bold;
@@ -428,6 +432,12 @@ input[type="checkbox"]{
   
   border-color :orange !important;
  
+}
+
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }
 
 
@@ -917,6 +927,7 @@ i {
 ::-webkit-scrollbar-thumb {
   background: #e48595c7;
   border-radius: 6px;
+  height: 5vh;
 }
 
 /* On hover, highlight the thumb */
