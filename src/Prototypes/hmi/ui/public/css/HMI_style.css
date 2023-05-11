@@ -800,6 +800,12 @@ i {
     opacity: 0.5;
   }
 
+  .label {
+    display: none;
+    color: red;
+    font-size: 12px;
+  }
+
   .dropdown-menu.faq-content {
     width: 100%;
     height: 1150px;
