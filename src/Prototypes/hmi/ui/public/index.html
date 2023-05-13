@@ -312,34 +312,33 @@
                   </div>
                 </div>             
               </div>
-              
-              <h2 style="margin-top: 20px !important;">Audio</h2>
+                <h2 id="audioHeader"style="margin-top: 20px !important;">Audio</h2>
 
-              <div class="audio_component">
-                <span><i class="fa fa-volume-up fa-2x" style="color:rgba(247, 186, 206, 0.6);" onclick="{toggleAudio()}"></i></span>
-                <div class="audioContainer">
-                  <div class="box box1"></div>
-                  <div class="box box2"></div>
-                  <div class="box box3"></div>
-                  <div class="box box4"></div>
-                  <div class="box box5"></div>
-                  <div class="box box6"></div>
-                  <div class="box box7"></div>
-                  <div class="box box8"></div>
-                  <div class="box box9"></div>
-                  <div class="box box10"></div>
-                  <div class="box box1"></div>
-                  <div class="box box2"></div>
-                  <div class="box box3"></div>
-                  <div class="box box4"></div>
-                  <div class="box box5"></div>
-                  <div class="box box6"></div>
-                  <div class="box box7"></div>
-                  <div class="box box8"></div>
-                  <div class="box box9"></div>
-                  <div class="box box10"></div>
+                <div id="audioControl" class="audio_component">
+                  <span><i class="fa fa-volume-up fa-2x" style="color:rgba(247, 186, 206, 0.6);" onclick="{toggleAudio()}"></i></span>
+                  <div class="audioContainer">
+                    <div class="box box1"></div>
+                    <div class="box box2"></div>
+                    <div class="box box3"></div>
+                    <div class="box box4"></div>
+                    <div class="box box5"></div>
+                    <div class="box box6"></div>
+                    <div class="box box7"></div>
+                    <div class="box box8"></div>
+                    <div class="box box9"></div>
+                    <div class="box box10"></div>
+                    <div class="box box1"></div>
+                    <div class="box box2"></div>
+                    <div class="box box3"></div>
+                    <div class="box box4"></div>
+                    <div class="box box5"></div>
+                    <div class="box box6"></div>
+                    <div class="box box7"></div>
+                    <div class="box box8"></div>
+                    <div class="box box9"></div>
+                    <div class="box box10"></div>
+                  </div>
                 </div>
-              </div>
               
             </div>
             <div id="animal-default-content">
@@ -793,7 +792,7 @@
 
   // Get all the dropdowns on the page
   const dropdowns = document.querySelectorAll(".dropdown");
-  console.log('dropdowns: ', dropdowns)
+  //console.log('dropdowns: ', dropdowns)
   
   // Add a click event listener to each dropdown
   dropdowns.forEach((dropdown) => {
@@ -816,8 +815,8 @@
 
 <script type="module">
   import { updateLayers, initialiseHMI, showMics, hideMics, updateAnimalMovementLayerFromPastData, updateVocalizationLayerFromPastData,
-  resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled, enableMicAnimation, disableMicAnimation } from "./js/HMI.js";
-  import {retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange} from "./js/routes.js";
+  resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled, enableMicAnimation, disableMicAnimation, getUTC } from "./js/HMI.js";
+  import {retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, startSimulator, stopSimulator} from "./js/routes.js";
   window.updateMics = updateMics;
   window.updateMicrophoneAnimation = updateMicrophoneAnimation;
   window.updateLayers = updateLayers;
@@ -831,20 +830,21 @@
 
   //update config
   hmiState.liveMode = true;
-  hmiState.simUpdateDelay = 5000;
-  hmiState.liveWindow = 60000;
+  hmiState.simUpdateDelay = 10000;
+  hmiState.liveWindow = 300000;
 
   //NOTE: Use the replay date to replay past data as though it were live
     //const replayDate = new Date('March 23, 2023 20:35:00');
     //const replayTimestamp = replayDate.getTime();
-  
-  const replayTimestamp = Date.now();
 
+  const utcTime = getUTC();
+  const replayTimestamp = utcTime;
 
-  hmiState.timeOffset = Date.now() - replayTimestamp;
-  hmiState.currentTime = Math.floor((Date.now() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-  hmiState.previousUpdateTime = Math.floor((Date.now() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-  hmiState.liveEventCutoff = Math.floor((Date.now() - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
+  hmiState.timeOffset = 0;
+  hmiState.simTime = getUTC();
+  hmiState.currentTime = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+  hmiState.previousUpdateTime = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+  hmiState.liveEventCutoff = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
 
   //Basemap config
   //pls do not change origin lat long, these are set to target wild otways region
@@ -872,7 +872,7 @@
   
 
   const movementEvents = {
-    "M_1":{animalId: "M_1", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 100, locationLat:-38.80266562762367 ,locationLon:143.560 , locationConfidence:100 , animalType:"reptile", animalStatus:"vulnerable" , animalDiet: "herbavore" },
+    "M_1":{animalId: "M_1", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "unknown", speciesIdentificationConfidence: 100, locationLat:-38.80266562762367 ,locationLon:143.560 , locationConfidence:100 , animalType:"reptile", animalStatus:"vulnerable" , animalDiet: "herbavore" },
     "M_2":{animalId: "M_2", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth", speciesScientificName: "Podargus strigoides", speciesIdentificationConfidence: 100, locationLat:-38.81905478815439 ,locationLon:143.524 , locationConfidence:100 , animalType:"bird", animalStatus:"normal" ,animalDiet: "herbavore" },
     "M_3":{animalId: "M_3", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 100, locationLat:-38.80166562762367 ,locationLon:143.540 , locationConfidence:100 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
     "M_4":{animalId: "M_4", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat:-38.82166562762367 ,locationLon:143.550 , locationConfidence:100 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "carnivore" },
@@ -897,6 +897,8 @@
   window.onload = function() {
     console.log("Website loaded!");
     initialiseHMI(hmiState);
+    //sim is on by default
+    startSimulator();
   };
 
   //Microphone show/hide
@@ -935,14 +937,16 @@
   //Live mode and date range picker
 
   const toggleSwitch = document.querySelector('#liveModeToggle');
+  const simulatorSwitch = document.querySelector('#simulatorToggle');
+  
   const pastDataContainer = document.querySelector('.past-data-container');
   //console.log("Live mode enabled");
 
   toggleSwitch.addEventListener('change', function() {
     if (this.checked) {
       resetWildlifeLayers(hmiState);
-      hmiState.currentTime = Math.floor((Date.now() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-      hmiState.previousUpdate = Math.floor((Date.now() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+      hmiState.currentTime = Math.floor((getUTC()- hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+      hmiState.previousUpdate = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
       hmiState.liveMode = true;
       //console.log("Live mode enabled");
       pastDataContainer.style.maxHeight = '0';
@@ -951,6 +955,16 @@
       hmiState.liveMode = false;
       //console.log("Live mode disabled");
       pastDataContainer.style.maxHeight = pastDataContainer.scrollHeight + 'px';
+    }
+  });
+
+  simulatorSwitch.addEventListener('change', function() {
+    if (this.checked) {
+      console.log("starting");
+      startSimulator();
+    } else {
+      console.log("stopping");
+      stopSimulator();
     }
   });
 

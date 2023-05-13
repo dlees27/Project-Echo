@@ -15,7 +15,7 @@ if (typeof window === 'undefined') {
   axios = window.axios;
 }
 
-const MESSAGE_API_URL = 'http://localhost:8000/hmi';
+const MESSAGE_API_URL = 'http://localhost:9000/hmi';
 
 export function retrieveTruthEventsInTimeRange(from, to) {
   var start = parseInt(from);
@@ -34,15 +34,18 @@ export function retrieveMicrophones() {
 }
 
 export function retrieveAudio(id){
-  console.log(`${MESSAGE_API_URL}/audio?id=${id}`);
+  //console.log(`${MESSAGE_API_URL}/audio?id=${id}`);
   return axios.get(`${MESSAGE_API_URL}/audio?id=${id}`);
 }
 
-/*
-export function retrieveAllMessages() {
-  return axios.get(`${MESSAGE_API_URL}/messages`);
+export function startSimulator(){
+  axios.post(`${MESSAGE_API_URL}/sim_control?control=Start`);
 }
 
-export function deleteMessage(id) {
-  return axios.delete(`${MESSAGE_API_URL}/messages/${id}`);
-}*/
+export function stopSimulator(){
+  axios.post(`${MESSAGE_API_URL}/sim_control?control=Stop`);
+}
+
+export function retrieveSimTime(){
+  return axios.get(`${MESSAGE_API_URL}/latest_movement`);
+}

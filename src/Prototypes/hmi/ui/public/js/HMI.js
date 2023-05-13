@@ -1,7 +1,8 @@
 "use strict";
 
 import { getAudioTestString } from "./HMI-utils.js";
-import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, retrieveMicrophones, retrieveAudio } from "./routes.js";
+import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, 
+  retrieveMicrophones, retrieveAudio, retrieveSimTime } from "./routes.js";
 import data from "./sample_data.json" assert { type: 'json' };
 
 var markups = ["elephant.png", "monkey.png", "tiger.png"];
@@ -47,8 +48,8 @@ var animalTypeIconLookup = {
   "mammal" : "Mammals",
   "bird" : "Bird",
   "amphibian" : "Amphibians",
-  "insect" : "insects",
-  "reptile" : "reptiles"
+  "insect" : "Insects",
+  "reptile" : "Reptiles"
 };
 
 var selectedVocalizationEventId = null;
@@ -146,7 +147,7 @@ export function updateVocalizationLayerFromPastData(hmiState, results){
   clearAllVocalizationLayers();
 
   hmiState.vocalizationEvents = [];
-  console.log(results);
+  //console.log(results);
 
   for (let data of results) {
     let event = convertJSONtoAnimalVocalizationEvent(hmiState, data);
@@ -181,6 +182,9 @@ export function updateAnimalMovementLayerFromLiveData(hmiState, results){
 
   //ensure events are unique per id
   for (let data of results) {
+    
+    //console.log(data);
+
     if(latestSimAnimals.hasOwnProperty(data.animalId)){
       let entry = latestSimAnimals[data.animalId];
       if(entry.timestamp < data.timestamp){
@@ -208,7 +212,10 @@ export function updateAnimalMovementLayerFromLiveData(hmiState, results){
     let layer = findMapLayerWithName(hmiState, layerName);
     const featureToPurge = layer.getSource().getFeatureById(evt.animalId);
     //console.log(featureToPurge);
-    layer.getSource().removeFeature(featureToPurge);
+    if(featureToPurge){
+      //console.log("purge lat: " + evt.locationLat + " lon: " + evt.locationLon);
+      layer.getSource().removeFeature(featureToPurge);
+    }
   }
 
   addNewTruthFeatures(hmiState, updatedMovementEvents);
@@ -220,6 +227,9 @@ export function updateVocalizationLayerFromLiveData(hmiState, results){
   let newVocalizationEvents = [];
 
   for (let data of results) {
+
+    //console.log(data);
+
     let event = convertJSONtoAnimalVocalizationEvent(hmiState, data);
     hmiState.vocalizationEvents.push(event);
     newVocalizationEvents.push(event);
@@ -267,13 +277,14 @@ export function convertJSONtoAnimalMovementEvent(hmiState, data){
 
   movementEvent.animalId = data.animalId;
   movementEvent.eventId = data._id;
-  movementEvent.timestamp = hmiState.currentTime;
+  movementEvent.timestamp = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
   movementEvent.eventTimestamp = data.timestamp;
   movementEvent.speciesScientificName = data.species.toLowerCase();
   movementEvent.speciesIdentificationConfidence = 100.0;
   movementEvent.locationLat = data.animalTrueLLA[0];
   movementEvent.locationLon = data.animalTrueLLA[1];
   movementEvent.locationConfidence = 100.0;
+
   movementEvent.animalType = data.type.toLowerCase();
   movementEvent.animalStatus = matchStatus(data.status.toLowerCase());
   movementEvent.animalDiet = data.diet.toLowerCase();
@@ -291,7 +302,7 @@ export function convertJSONtoAnimalVocalizationEvent(hmiState, data){
   vocalizationEvent.eventTimestamp = data.timestamp;
   vocalizationEvent.eventId = data._id;
 
-  console.log(vocalizationEvent.eventId);
+  //console.log(vocalizationEvent.eventId);
   
   vocalizationEvent.speciesIdentificationConfidence = data.confidence;
   vocalizationEvent.speciesScientificName = data.species.toLowerCase();
@@ -356,21 +367,20 @@ export function stopAudioPlayback(){
   activeAudioNode = null;
 }
 
-function playAudioString(audioDataString) {
+function playAudioString(audioDataString, sampleRate) {
   // Convert the binary audio data string into a typed array
   const audioData = new Uint8Array(
     atob(audioDataString)
       .split("")
       .map((char) => char.charCodeAt(0))
   );
-
+         
   // Create an audio context
   const audioContext = new AudioContext();
   
   const el = document.getElementById("player");
   // Create a new audio buffer
   const numChannels = 1;
-  const sampleRate = 44100;
   const bufferLength = audioData.length / 2;
 
   const audioBuffer = audioContext.createBuffer(
@@ -383,7 +393,7 @@ function playAudioString(audioDataString) {
   audioBuffer.copyToChannel(new Float32Array(audioData.buffer), 0);
 
   let duration = audioBuffer.duration;
-  console.log(duration);
+  //console.log(duration);
 
   // Create a new audio buffer source node and set its buffer
   activeAudioNode = audioContext.createBufferSource();
@@ -466,7 +476,8 @@ function addAllTruthFeatures(hmiState) {
         animalConfidence: entry.speciesIdentificationConfidence,
         animalLocConfidence: entry.locationConfidence,
         animalIcon: iconPath,
-        animalRecordDate: entry.timestamp
+        animalRecordDate: entry.timestamp,
+        isAnimalMovement: 1,
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
     
@@ -522,7 +533,8 @@ function addNewTruthFeatures(hmiState, events) {
         animalConfidence: entry.speciesIdentificationConfidence,
         animalLocConfidence: entry.locationConfidence,
         animalIcon: iconPath,
-        animalRecordDate: entry.timestamp
+        animalRecordDate: entry.timestamp,
+        isAnimalMovement: 1,
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
 
@@ -578,7 +590,8 @@ function addAllVocalizationFeatures(hmiState) {
         animalDiet: entry.animalDiet,
         animalIcon: iconPath,
         animalRecordDate: entry.timestamp,
-        eventId: entry.eventId
+        eventId: entry.eventId,
+        isAnimalMovement: 0,
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
     
@@ -634,7 +647,8 @@ function addNewVocalizationFeatures(hmiState, events) {
         animalDiet: entry.animalDiet,
         animalIcon: iconPath,
         animalRecordDate: entry.timestamp,
-        eventId: entry.eventId 
+        eventId: entry.eventId,
+        isAnimalMovement: 0,
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
 
@@ -942,8 +956,16 @@ function createMapClickEvent(hmiState){
 
       let values = feature.getProperties();
       if (values.eventId){
-        console.log("saving " + values.eventId);
+        //console.log("saving " + values.eventId);
         selectedVocalizationEventId = values.eventId;
+      }
+      if(values.isAnimalMovement){
+        document.getElementById("audioHeader").style.display = "none"
+        document.getElementById("audioControl").style.display = "none"
+      }
+      else{
+        document.getElementById("audioHeader").style.display = "flex"
+        document.getElementById("audioControl").style.display = "flex"
       }
       if (values.animalSpecies){
           //console.log(values.animalSpecies)
@@ -953,13 +975,13 @@ function createMapClickEvent(hmiState){
             img.onload = function() {
               //console.log('Image exists!');
               // Set the source of the img tag
-              document.getElementById("desc_img").src = "../../images/bio/" + result.common + ".png";
+              document.getElementById("desc_img").src = "../../images/bio/" + result.common.toLowerCase() + "-bio.png";
             }
             img.onerror = function() {
-              let dice = Math.floor(Math.random() * 6) + 1;
-              document.getElementById("desc_img").src = "../../images/bio/not_available_" + dice + ".png";
+              let dice = Math.floor(Math.random() * 5) + 1;
+              document.getElementById("desc_img").src = "../../images/bio/not_available_" + dice + "-bio.png";
             }
-            img.src = "../../images/bio/" + result.common + ".png";
+            img.src = "../../images/bio/" + result.common.toLowerCase() + "-bio.png";
           
             //console.log("found")
             //Animal Bio specific session
@@ -980,6 +1002,21 @@ function createMapClickEvent(hmiState){
                 summary.appendChild(p);
               }
             })
+          }
+          else{
+            let dice = Math.floor(Math.random() * 5) + 1;
+            document.getElementById("desc_img").src = "../../images/bio/not_available_" + dice + "-bio.png";
+
+            document.getElementById("desc_name").innerText = values.animalSpecies;
+            //document.getElementById("markup_img_2").src = values.animalIcon;
+            document.getElementById("desc_confidence").innerText = values.animalLocConfidence + "%";
+            document.getElementById("desc_species").innerText = values.animalSpecies;
+            document.getElementById("desc_summary").innerText = "Bio data coming soon.";
+            let summary = document.getElementById("desc_details");
+            summary.innerHTML = '';
+          }
+
+
             //Markup details specific session
             let dateFormat = new Date(values.animalRecordDate);
             document.getElementById("markup_img").src = values.animalIcon;
@@ -992,13 +1029,16 @@ function createMapClickEvent(hmiState){
             animal_toggled = true;
             const toggled_animal = new CustomEvent('animalToggled',{
               detail: {
-                message: "Animal toggled: " + result.common,
+                message: "Animal toggled:",
               }
             })
 
             document.dispatchEvent(toggled_animal);
-          }
+          
 
+      }
+      else{
+        console.log(values);
       }
     } else {
       active_content.hide();
@@ -1023,7 +1063,7 @@ export function MapCloseNav() {
 }
 
 function updateTruthEvents(hmiState){
-  retrieveTruthEventsInTimeRange(hmiState.previousUpdateTime, hmiState.currentTime).then((res) => {
+  retrieveTruthEventsInTimeRange(hmiState.currentTime-5, hmiState.currentTime).then((res) => {
     updateAnimalMovementLayerFromLiveData(hmiState, res.data);
     //TODO also update vocalisation layer here.
   })
@@ -1031,7 +1071,7 @@ function updateTruthEvents(hmiState){
 
 //TODO Implement this
 function updateVocalizationEvents(hmiState){
-  retrieveVocalizationEventsInTimeRange(hmiState.previousUpdateTime, hmiState.currentTime).then((res) => {
+  retrieveVocalizationEventsInTimeRange(hmiState.currentTime-5, hmiState.currentTime).then((res) => {
     updateVocalizationLayerFromLiveData(hmiState, res.data);
     //TODO also update vocalisation layer here.
   })
@@ -1089,12 +1129,46 @@ function simulateData(hmiState) {
   queueSimUpdate(hmiState);
 }
 
+export function getUTC(){
+  const now = new Date();
+  const utcTimestamp = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
+    now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds());
+  return utcTimestamp;
+}
+
+export function updateTimeOffset(hmiState){
+  try{
+  retrieveSimTime().then((res) => {
+    //console.log(res.data);
+    let unix = Date.parse(res.data.timestamp) / 1000;
+    let newDelay = (getUTC() - new Date((unix + (10*60*60)) * 1000)) + 10000;
+    if(isNaN(newDelay)){
+      hmiState.simUpdateDelay = 10000;
+    }
+    else{
+      hmiState.simUpdateDelay = newDelay;
+    }
+    // Multiply by 1000 to convert to milliseconds
+    /*const utcDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+      date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+    hmiState.simTime = utcDate;*/
+    //console.log(hmiState.simUpdateDelay);
+  });
+  }catch(error){
+    console.log(failed);
+    hmiState.simUpdateDelay = 10000;
+  }
+}
+
 let simUpdateTimeout = null;
 
 function queueSimUpdate(hmiState) {
   if(hmiState.liveMode){
-    hmiState.currentTime = Math.floor((Date.now() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-    hmiState.liveEventCutoff = Math.floor((Date.now() - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
+    updateTimeOffset(hmiState);
+
+    hmiState.currentTime = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+    hmiState.liveEventCutoff = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
+                
     purgeTruthEvents(hmiState);
     purgeVocalizationEvents(hmiState);
     updateTruthEvents(hmiState);
@@ -1124,17 +1198,17 @@ function queueSimUpdate(hmiState) {
 }
 
 document.addEventListener('playAudio', function(event){
-  console.log("play audio");
+  //console.log("play audio");
   playNextTrack = true;
   if(selectedVocalizationEventId != null){
     retrieveAudio(selectedVocalizationEventId).then((res) => {
-      playAudioString(res.data.audioClip);
+      playAudioString(res.data.audioClip, res.data.sampleRate);
     })
   }
 })
 
 document.addEventListener('stopAudio', function(event){
-  console.log("stop audio");
+  //console.log("stop audio");
   playNextTrack = false;
   stopAudioPlayback();
 })
