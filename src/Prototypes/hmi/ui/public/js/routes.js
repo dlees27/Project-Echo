@@ -8,12 +8,23 @@ requirejs.config({
 });*/
 
 let axios;
+let dotenv;
 
 if (typeof window === 'undefined') {
   axios = require('axios');
 } else {
   axios = window.axios;
 }
+
+if (typeof window === 'undefined') {
+  dotenv = require('dotenv');
+} else {
+  dotenv = window.dotenv;
+}
+
+dotenv.config();
+
+console.log(process.env.API_HOST)
 
 const MESSAGE_API_URL = 'http://localhost:9000/hmi';
 
