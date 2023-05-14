@@ -6,9 +6,11 @@ requirejs.config({
     //are loaded relative to the top-level JS file.
     nodeRequire: require
 });*/
+import config from "./config.json" assert { type: 'json' };
 
 let axios;
-let dotenv;
+
+let MESSAGE_API_URL = '';
 
 if (typeof window === 'undefined') {
   axios = require('axios');
@@ -18,15 +20,15 @@ if (typeof window === 'undefined') {
 
 if (typeof window === 'undefined') {
   dotenv = require('dotenv');
+  dotenv.config();
+  MESSAGE_API_URL = process.env.API_HOST;
+
+  console.log(MESSAGE_API_URL);
 } else {
-  dotenv = window.dotenv;
+  MESSAGE_API_URL = config.API_HOST;
+
+  console.log(MESSAGE_API_URL);
 }
-
-dotenv.config();
-
-console.log(process.env.API_HOST)
-
-const MESSAGE_API_URL = 'http://localhost:9000/hmi';
 
 export function retrieveTruthEventsInTimeRange(from, to) {
   var start = parseInt(from);
