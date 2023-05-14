@@ -15,7 +15,7 @@ if (typeof window === 'undefined') {
   axios = window.axios;
 }
 
-const MESSAGE_API_URL = 'http://localhost:9000/hmi';
+const MESSAGE_API_URL = 'http://echo-api-service:9000/hmi';
 
 export function retrieveTruthEventsInTimeRange(from, to) {
   var start = parseInt(from);
